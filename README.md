@@ -1,5 +1,23 @@
 # TripAdvisor-Crawler
 
+## Crawling attributes 
+- HotelName
+- HotelRating
+- HotelLocation
+- HotelRank
+- AmountofReviews
+- Username
+- Userrating
+- Usergender
+- UserCountry
+- UserAge
+- UserStayDate
+- UserReviewTitle
+- UserReviewText
+- UserPictureNumber (number of photos posted)
+- UserPictureAddress
+- GoodOrBad
+
 ## Conditions to match until 02/05/17
 Ziel: Lauffähiger und benutzerfreundlicher Prototyp mit dem erfolgreichen Crawlen und Speichern eines/mehrerer Hotels in eine MySQL-Datenbank. 
 
