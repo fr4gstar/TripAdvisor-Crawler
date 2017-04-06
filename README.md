@@ -1,10 +1,5 @@
 # TripAdvisor-Crawler
 
-This repository holds the TypeScript source code of the [angular.io quickstart](https://angular.io/docs/ts/latest/quickstart.html),
-the foundation for most of the documentation samples and potentially a good starting point for your application.
-
-It's been extended with testing support so you can start writing tests immediately.
-
 ## Conditions to match until 02/05/17
 Ziel: Lauffähiger und benutzerfreundlicher Prototyp mit dem erfolgreichen Crawlen und Speichern eines/mehrerer Hotels in eine MySQL-Datenbank. 
 
@@ -36,11 +31,3 @@ Crawler- PHP - Andreas:
 - UI -> AngularJS2
 - DB -> MySQL
 - Crawler -> PHP
-
-
-Initialize this project as a *local git repo* and make the first commit:
-```shell
-git init
-git add .
-git commit -m "Initial commit"
-```
