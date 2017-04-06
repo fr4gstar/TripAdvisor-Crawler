@@ -1,4 +1,4 @@
-import {Component, ViewChild, QueryList, ViewChildren, OnInit, AfterViewInit} from '@angular/core';
+import {Component, ViewChild, Output, EventEmitter, OnInit, AfterViewInit} from '@angular/core';
 import {Http} from '@angular/http';
 import {
   ShapeOptions,
@@ -27,12 +27,9 @@ import {
       </div>
       <hr/>
   
-      <div id="console-component">
+      <div id="console">
         <h4>X. Console Output</h4>
-        <textarea *ngFor="let person of data" name="console" cols="100px" rows="1">
-            {{person.id}} - {{person.first_name}}
-  
-          </textarea>
+          <pre>{{log}}</pre>
       </div>
       <hr/>
     </div>`,
@@ -41,17 +38,23 @@ import {
 })
 export class CrawlerComponent implements OnInit, AfterViewInit {
   @ViewChild(LineProgressComponent) lineComp: LineProgressComponent;
+  @Output() nameChange: EventEmitter<String> = new EventEmitter<String>();
 
   private lineOptions: ShapeOptions = {
-    strokeWidth: 4,
+    strokeWidth: 2,
     easing: 'easeInOut',
     duration: 1400,
-    color: '#3f50ff',
+    color: '#cec9d8',
     trailColor: '#eee',
     trailWidth: 1,
     svgStyle: { width: '100%' }
   };
   private data;
+  private log: string = `Log started!'\n`;
+
+  private logText(value: string): void {
+    this.log += `${value}\n`;
+  }
 
   constructor(private http: Http) {
   }
@@ -66,5 +69,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.lineComp.animate(1);
+    this.logText('after init ...');
+    this.logText('after init ...');
   }
 }
