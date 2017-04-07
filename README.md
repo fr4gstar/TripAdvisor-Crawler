@@ -45,7 +45,6 @@ Crawler- PHP - Andreas:
 
 
 ## Architecture
-
 - UI -> AngularJS2
-- DB -> MySQL
-- Crawler -> PHP
+- DB -> MySQL(XAMPP)
+- Crawler -> ApacheWebServer(XAMPP) + PHP

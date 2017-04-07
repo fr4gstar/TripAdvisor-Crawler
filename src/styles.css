@@ -112,16 +112,15 @@ nav a.active {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-title {
-  float: left;
+header {
   position: fixed;
   padding: 10px;
-  bottom: 0;
+  top: 0;
+  text-align:center;
+  background-color: black;
+  color: white;
   left: 0;
   right: 0;
-  background: black;
-  color: white;
-  text-align: center;
 }
 
 

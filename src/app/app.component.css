@@ -29,11 +29,24 @@ nav a.active {
 
 footer {
   position: fixed;
-  padding: 10px;
+  padding: 5px;
   bottom: 0;
   left: 0;
   right: 0;
   background: black;
   color: white;
   text-align: center;
+  font-size: x-small;
 }
+
+header {
+   position: fixed;
+   padding: 10px;
+   top: 0;
+   text-align:center;
+   background-color: black;
+   color: white;
+   left: 0;
+   right: 0;
+   font-size: large;
+ }

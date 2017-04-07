@@ -85,7 +85,9 @@ textarea {
 #console{
   float: left;
   width: 100%;
-  height: 40%;
+  height: 20%;
+  max-height: 20%;
+  font-size: x-small;
   resize: none;
   border: black;
 }
