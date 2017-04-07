@@ -3,6 +3,9 @@ import {Http} from '@angular/http';
 import {
   ShapeOptions,
   LineProgressComponent} from 'angular2-progressbar';
+import 'rxjs/add/operator/map';
+//import 'rxjs/add/operator/catch';
+//import 'rxjs/Rx';
 
 @Component({
   selector: 'my-crawler',
@@ -13,9 +16,9 @@ import {
 
         <form name="urlForm" (ng-submit)="getData()">
           <label>
-            <input type="url" class="url" ng-model="urlText" ng-required="true" >
+            <input #url type="url" class="url" ng-model="urlText" ng-required="true" >
           </label>
-          <button id="btn_start" type="button" (click)="getData()">Start</button>
+          <button id="btn_start" type="button" (click)="getData(url.value)">Start</button>
         </form>
 
        
@@ -31,20 +34,27 @@ import {
       <h4>2. Progress</h4>
       <div class="line-container">
         <ks-line-progress [options]="lineOptions"></ks-line-progress>
+        <hr/>
       </div>
-      <hr/>
+      
   
       <div id="console">
         <h4>Crawled items</h4>
+        <div id="crawledBox">
             <ul>
-              <li *ngFor="let person of data">
-                {{person.id}} - {{person.first_name}}
+              <li *ngFor="let d of data">
+                {{d.r_id}} - {{d.title}}
               </li>
             </ul>
+        </div>
+        <hr/>
         <h4>Console</h4>
+        <div id="logBox">
           <pre>{{log}}</pre>
+        </div>
+        <hr/>
       </div>
-      <hr/>
+      
     </div>`,
   // templateUrl: './crawler.component.html',
   styleUrls: [ './dashboard.component.css'  ]
@@ -71,6 +81,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   };
 
   private data = '';
+  // private result = '';
   private logNr: number = 0;
   private log: string = '';
 
@@ -85,23 +96,42 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.logText(`Log started!`);
   }
-  getData() {
-    let start = (new Date().getTime());
-    this.logText('Start Crawling!' );
-    // this.lineComp.setText();
-    this.lineComp.setProgress(0.0);
-    this.http.get('http://localhost/test.php/')
-              .subscribe(res => this.data = res.json());
+  getData(url: string) {
 
-    this.lineComp.setText('Finished');
-    let end = new Date().getTime();
-    this.lineComp.animate(1.0);
+    this.lineComp.setProgress(0.0);
+    let start = (new Date().getTime());
+    let end;
+
+    this.lineComp.setProgress(0.2);
+    if (url.toString().startsWith('https://www.tripadvisor.de/')) {
+      this.logText('Start Crawling!' );
+
+
+      this.http.get('http://localhost/crawler.php?url=' + url)
+                .map(response => response.json())
+                .subscribe(result => this.data = result);
+
+      this.lineComp.setProgress(0.8);
+      /*
+
+      this.http.get('http://localhost/crawlerStart.php')
+        .map((res: Response) => res.json())
+        .subscribe(res => this.data = res.json());
+      */
+      this.logText('Crawling from URL: ' + url);
+      this.lineComp.animate(1.0);
+      this.lineComp.setText('Successful');
+    } else {
+      this.lineComp.animate(0.0);
+      this.lineComp.setText('Failed - by URL' + url);
+    }
+    end = new Date().getTime();
     this.logText('End Crawling!');
     this.logText('Total time: ' + ((end - start) / 1000) + 'ms \n');
+
   }
 
   ngAfterViewInit() {
     this.lineComp.setProgress(0.0);
-    this.logText('after init ... \n');
   }
 }
