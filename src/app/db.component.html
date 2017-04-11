@@ -1,8 +1,28 @@
-<h3>DATABASE</h3>
-<div class="grid grid-pad">
-  <a *ngFor="let hero of heroes"  [routerLink]="['/detail', hero.id]"  class="col-1-4">
-    <div class="module hero">
-      <h4>{{hero.name}}</h4>
-    </div>
-  </a>
+<div>
+  <h4> Crawled items in the Database</h4>
+
+  <generic-table [gtClasses]="'table-sm'" #myTable [gtSettings]="configObject.settings" [gtFields]="configObject.fields" [(gtData)]="configObject.data"></generic-table>
+  <div class="text-center">
+    <small><gt-table-info class="form-text text-muted mb-2" [genericTable]="myTable"></gt-table-info></small>
+    <gt-pagination [gtClasses]="'pagination-sm justify-content-center'" [genericTable]="myTable"></gt-pagination>
+  </div>
+  <div id="db-component">
+
+    <!--
+            <h4>1. Copy URL of single Hotel to the input box and press the "Start" button</h4>
+
+            <form name="urlForm" (ng-submit)="getData()">
+              <label>
+                <input #url type="url" class="url" ng-model="urlText" ng-required="true" >
+              </label>
+              <button id="btn_start" type="button" (click)="getData(url.value)">Start</button>
+            </form>
+
+            <!-- <div *ngFor="let person of data | async"
+                    (click)="getData()" class="search-result" >
+                 {{person.first_name}}
+             </div>
+             -->
+
+  </div>
 </div>

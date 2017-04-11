@@ -4,59 +4,12 @@ import {
   ShapeOptions,
   LineProgressComponent} from 'angular2-progressbar';
 import 'rxjs/add/operator/map';
-//import 'rxjs/add/operator/catch';
-//import 'rxjs/Rx';
+// import 'rxjs/add/operator/catch';
+// import 'rxjs/Rx';
 
 @Component({
   selector: 'my-crawler',
-  template: `
-    <div>
-      <div id="crawl-component">
-        <h4>1. Copy URL of single Hotel to the input box and press the "Start" button</h4>
-
-        <form name="urlForm" (ng-submit)="getData()">
-          <label>
-            <input #url type="url" class="url" ng-model="urlText" ng-required="true" >
-          </label>
-          <button id="btn_start" type="button" (click)="getData(url.value)">Start</button>
-        </form>
-
-       
-       <!-- <div *ngFor="let person of data | async"
-               (click)="getData()" class="search-result" >
-            {{person.first_name}}
-        </div>
-        -->
-        
-      </div>
-      <hr/>
-  
-      <h4>2. Progress</h4>
-      <div class="line-container">
-        <ks-line-progress [options]="lineOptions"></ks-line-progress>
-        <hr/>
-      </div>
-      
-  
-      <div id="console">
-        <h4>Crawled items</h4>
-        <div id="crawledBox">
-            <ul>
-              <li *ngFor="let d of data">
-                {{d.r_id}} - {{d.title}}
-              </li>
-            </ul>
-        </div>
-        <hr/>
-        <h4>Console</h4>
-        <div id="logBox">
-          <pre>{{log}}</pre>
-        </div>
-        <hr/>
-      </div>
-      
-    </div>`,
-  // templateUrl: './crawler.component.html',
+  templateUrl: './crawler.component.html',
   styleUrls: [ './dashboard.component.css'  ]
 })
 export class CrawlerComponent implements OnInit, AfterViewInit {
@@ -81,6 +34,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   };
 
   private data = '';
+  private previewData = '';
   // private result = '';
   private logNr: number = 0;
   private log: string = '';
@@ -96,13 +50,38 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.logText(`Log started!`);
   }
+  getPreview(url: string) {
+    let start = (new Date().getTime());
+    let end;
+    if (url.toString() === '') {
+      this.lineComp.setProgress(0.0);
+      this.lineComp.setText('Ready to Start!');
+      this.logText('Ready to Start!');
+    } else if (url.toString().startsWith('https://www.tripadvisor.de/')) {
+      this.logText('Start Preview Loading!' );
+      this.http.get('http://localhost/preview.php?url=' + url)
+        .map(response => response.json())
+        .subscribe(result => this.previewData = result);
+      this.lineComp.animate(0.1);
+      this.lineComp.setText('Preview loaded - Ready to Start!');
+      this.logText('Preview loading - URL: ' + url);
+    } else {
+      this.lineComp.setProgress(0.0);
+      this.lineComp.setText('Invalid URL: ' + url);
+      this.logText('Invalid URL: ' + url);
+    }
+    end = new Date().getTime();
+    this.logText('End Preview loading!');
+    this.logText('Total time: ' + ((end - start) / 1000) + 'ms \n');
+  }
+
   getData(url: string) {
 
     this.lineComp.setProgress(0.0);
     let start = (new Date().getTime());
     let end;
 
-    this.lineComp.setProgress(0.2);
+    this.lineComp.animate(0.2);
     if (url.toString().startsWith('https://www.tripadvisor.de/')) {
       this.logText('Start Crawling!' );
 
@@ -111,19 +90,19 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
                 .map(response => response.json())
                 .subscribe(result => this.data = result);
 
-      this.lineComp.setProgress(0.8);
+      this.lineComp.animate(0.8);
       /*
 
       this.http.get('http://localhost/crawlerStart.php')
         .map((res: Response) => res.json())
         .subscribe(res => this.data = res.json());
       */
-      this.logText('Crawling from URL: ' + url);
+      this.logText('Crawling - URL: ' + url);
       this.lineComp.animate(1.0);
       this.lineComp.setText('Successful');
     } else {
-      this.lineComp.animate(0.0);
-      this.lineComp.setText('Failed - by URL' + url);
+      this.lineComp.setProgress(0.0);
+      this.lineComp.setText('Invalid URL: ' + url);
     }
     end = new Date().getTime();
     this.logText('End Crawling!');

@@ -25,6 +25,7 @@
       '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
 
       'angular2-progressbar': 'node_modules/angular2-progressbar',
+      'angular-generic-table': 'node_modules/angular-generic-table',
       'progressbar.js': 'node_modules/progressbar.js',
       // other libraries
       'rxjs':                      'npm:rxjs',
@@ -49,6 +50,10 @@
       },
       'progressbar.js': {
         main: 'dist/progressbar.js',
+        defaultExtension: 'js'
+      },
+      'angular-generic-table': {
+        main: 'index.js',
         defaultExtension: 'js'
       }
     }

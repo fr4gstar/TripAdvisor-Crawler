@@ -1,6 +1,6 @@
 {
-  "name": "angular-quickstart",
-  "version": "1.0.0",
+  "name": "tripadvisor-crawler",
+  "version": "0.0.3",
   "description": "QuickStart package.json from the documentation, supplemented with testing support",
   "scripts": {
     "build": "tsc -p src/",
@@ -21,7 +21,7 @@
     "lint": "tslint ./src/**/*.ts -t verbose"
   },
   "keywords": [],
-  "author": "",
+  "author": "Sergej Bardin",
   "license": "MIT",
   "dependencies": {
     "@angular/common": "~4.0.0",
@@ -32,10 +32,11 @@
     "@angular/platform-browser": "~4.0.0",
     "@angular/platform-browser-dynamic": "~4.0.0",
     "@angular/router": "~4.0.0",
+    "angular-generic-table": "^4.0.1",
     "angular-in-memory-web-api": "~0.3.0",
     "angular2-progressbar": "^0.5.1",
-    "progressbar.js": "^1.0.1",
     "core-js": "^2.4.1",
+    "progressbar.js": "^1.0.1",
     "rxjs": "5.0.1",
     "systemjs": "0.19.40",
     "zone.js": "^0.8.4"
@@ -55,9 +56,10 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "protractor": "~4.0.14",
     "rimraf": "^2.5.4",
-      "typings": "^1.0.4",
+    "typings": "^1.0.4",
     "@types/node": "^6.0.46",
     "@types/jasmine": "2.5.36"
   },
-  "repository": {}
+  "repository": {},
+  "main": "karma-test-shim.js"
 }

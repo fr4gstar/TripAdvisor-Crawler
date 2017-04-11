@@ -8,6 +8,7 @@ import { DashboardComponent }   from './dashboard.component';
 import { CrawlerComponent }   from './crawler.component';
 import { DBComponent }   from './db.component';
 import { HttpModule, JsonpModule } from '@angular/http';
+import { GenericTableModule } from 'angular-generic-table';
 
 @NgModule({
   imports:      [
@@ -15,6 +16,7 @@ import { HttpModule, JsonpModule } from '@angular/http';
                     AppRoutingModule,
                     HttpModule,
                     ProgressBarModule,
+                    GenericTableModule,
                     JsonpModule
                 ],
   declarations: [

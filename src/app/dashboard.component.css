@@ -76,7 +76,7 @@ textarea {
 }
 
 #btn_start{
-  width: 15%;
+  width: 25%;
   background: green;
   color: white;
 }
@@ -108,4 +108,13 @@ textarea {
   overflow-y: scroll;
 }
 
+#crawl-component, #db-component{
+  float: left;
+  width: 100%;
+  border: black;
+  margin: 10px;
+}
 
+#buttonBox{
+  text-align: center;
+}

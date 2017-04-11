@@ -1,7 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
     $url = $_GET["url"];
-
     if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
         die('Not a valid URL');
     } else {
@@ -9,7 +8,6 @@ function extractInfos($url){
     $data = array();
 	$dom = new DOMDocument('1.0');
 	$dom->loadHTMLFile($url);
-
 	$links = $dom->getElementsByTagName('div');
 	//echo('<h1>' . $url . '</h1>');
 	foreach($links as $element){
@@ -20,7 +18,7 @@ function extractInfos($url){
 			//echo('<b>' . $element->getAttribute('id') . '</b><br>');
 			$id = $element->getAttribute('id');
 			$divs = $element->getElementsByTagName('div');
-			
+
 			foreach($divs as $div){
 				if($div->getAttribute('class') == 'quote'){
 					//echo('<b>Überschrift der Bewertung: </b>' . $div->nodeValue . '<br>');
@@ -40,7 +38,7 @@ function extractInfos($url){
 					//echo('<b>Bewertungsdatum: </b>' . $span->nodeValue . '<br>');
 				}
 			}
-			
+
 			$imgs = $element->getElementsByTagName('img');
 			foreach($imgs as $img){
 				if($img->getAttribute('class') == 'sprite-rating_s_fill rating_s_fill s00'){
@@ -67,18 +65,17 @@ function extractInfos($url){
 					//echo('<b>Bewertung: </b> 5 von 5');
 					$bewertung = "5";
 				}
-				
+
 				if($img->getAttribute('class') == 'reviewInlineImage'){
 					//echo('<b>Bildlink: </b> ' . $img->getAttribute('src'));
 				}
 			}
 			  array_push($data, array('r_id' => $id, 'title' => $ueberschrift));
-
 		}
 	}
 	echo json_encode($data);
+	//return $data;
 }
-
 function getNaechsteSeite($url){
 	$dom = new DOMDocument('1.0');
 	$dom->loadHTMLFile($url);
@@ -90,11 +87,10 @@ function getNaechsteSeite($url){
 	}
 	return $url;
 }
-
 error_reporting(E_ERROR | E_PARSE);
-
 function crawlBewertungen(){
 	$url = 'https://www.tripadvisor.de/ShowUserReviews-g187309-d201817-r471437591-Carat_Hotel_Apartments_Munchen-Munich_Upper_Bavaria_Bavaria.html#REVIEWS';
+
 	while($url != null){
 		extractInfos($url);
 		$url = getNaechsteSeite($url);
