@@ -6,7 +6,7 @@ import { CrawlerComponent }   from './crawler.component';
 import { DBComponent }   from './db.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/crawler', pathMatch: 'full' },
   { path: 'dashboard',  component: DashboardComponent },
   { path: 'db',  component: DBComponent },
   { path: 'crawler',  component: CrawlerComponent }
