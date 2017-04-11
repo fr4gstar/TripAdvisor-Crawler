@@ -1,17 +1,24 @@
 <div>
   <div id="crawl-component">
-    <h4>Copy URL of a single Hotel to the input box and press the "Start" button</h4>
-    <h6>Only www.tripadvisor.de is supported! Example URL:
+    <h4>Copy URL of a single Hotel to the input box and press the "Import to Database" button
+    <div class="tooltip">
+      <img src="icons/qm.png" alt="Mountain View" style="width:20px;height:20px;">
+
+      <span class="tooltiptext">
+        <h6>Only www.tripadvisor.de is supported! Example URL:
       <br/>
       https://www.tripadvisor.de/ShowUserReviews-g187309-d201817-r471437591-Carat_Hotel_Apartments_Munchen-Munich_Upper_Bavaria_Bavaria.html
-    </h6>
+    </h6></span>
+    </div>
+    </h4>
     <form name="urlForm">
       <label>
         <input #url type="url" class="url" (input)="getPreview(url.value)" ng-model="urlText" ng-required="true" >
       </label>
-
+      <label>
+        Max. Runtime(seconds): <input #maxruntime ng-model="maxRuntime" type="number" ng-required="true" value="120" max="3600" min="60">
+      </label>
     </form>
-
   </div>
 
   <div class="line-container">
@@ -20,22 +27,22 @@
 
   <hr/>
 
-  <div class="preview">
+  <div *ngIf="preview" class="preview">
     <h4>Preview</h4>
     <ul *ngFor="let d of previewData">
       Hotel: {{d.name}} <br />
-      Location: {{d.street}} {{d.locality}} <br />
+      Location: {{d.street}}, {{d.locality}} <br />
       Country: {{d.country}}  <br />
       Amount of Reviews: {{d.amountOfReviews}}  <br />
     </ul>
     <hr/>
   </div>
+
   <div id="buttonBox">
-    <button id="btn_start" type="button" (click)="getData(url.value)">Start</button>
+    <button id="btn_start" type="button" (click)="getData(url.value)">Import to Database</button>
   </div>
 
-
-  <div id="console">
+  <div *ngIf="debugMode" id="console">
     <h4>Crawled items</h4>
     <div id="crawledBox">
       <ul>
@@ -49,6 +56,6 @@
     <div id="logBox">
       <pre>{{log}}</pre>
     </div>
+    <hr/>
   </div>
-  <hr/>
 </div>

@@ -33,11 +33,13 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     svgStyle: { width: '100%' }
   };
 
+  private preview = false;
   private data = '';
   private previewData = '';
-  // private result = '';
   private logNr: number = 0;
   private log: string = '';
+  // Switch to Debug Mode with Console
+  private debugMode: boolean = false;
 
   private logText(value: string): void {
     this.log += `${this.logNr}: ${value}\n`;
@@ -54,20 +56,24 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     let start = (new Date().getTime());
     let end;
     if (url.toString() === '') {
+      this.preview = false;
       this.lineComp.setProgress(0.0);
-      this.lineComp.setText('Ready to Start!');
-      this.logText('Ready to Start!');
+      this.lineComp.setText('Waiting for URL!');
+      this.logText('Waiting for URL!');
     } else if (url.toString().startsWith('https://www.tripadvisor.de/')) {
       this.logText('Start Preview Loading!' );
+      this.logText('URL is valid!' );
       this.http.get('http://localhost/preview.php?url=' + url)
         .map(response => response.json())
         .subscribe(result => this.previewData = result);
+      this.preview = true;
       this.lineComp.animate(0.1);
       this.lineComp.setText('Preview loaded - Ready to Start!');
       this.logText('Preview loading - URL: ' + url);
     } else {
+      this.preview = false;
       this.lineComp.setProgress(0.0);
-      this.lineComp.setText('Invalid URL: ' + url);
+      this.lineComp.setText('Invalid URL!');
       this.logText('Invalid URL: ' + url);
     }
     end = new Date().getTime();
