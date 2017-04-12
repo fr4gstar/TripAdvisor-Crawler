@@ -38,6 +38,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   private previewData = '';
   private logNr: number = 0;
   private log: string = '';
+  private urlCheck: string = 'https://www.tripadvisor.de/Hotel_Review-g';
   // Switch to Debug Mode with Console
   private debugMode: boolean = false;
 
@@ -52,6 +53,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.logText(`Log started!`);
   }
+
   getPreview(url: string) {
     let start = (new Date().getTime());
     let end;
@@ -60,15 +62,17 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
       this.lineComp.setProgress(0.0);
       this.lineComp.setText('Waiting for URL!');
       this.logText('Waiting for URL!');
-    } else if (url.toString().startsWith('https://www.tripadvisor.de/')) {
+    } else if (url.toString().startsWith(this.urlCheck)) {
       this.logText('Start Preview Loading!' );
       this.logText('URL is valid!' );
+
       this.http.get('http://localhost/preview.php?url=' + url)
-        .map(response => response.json())
-        .subscribe(result => this.previewData = result);
+                .map(response => response.json())
+                .subscribe(result => this.previewData = result);
+
       this.preview = true;
-      this.lineComp.animate(0.1);
-      this.lineComp.setText('Preview loaded - Ready to Start!');
+      this.lineComp.animate(0.0);
+      this.lineComp.setText('Check Preview!');
       this.logText('Preview loading - URL: ' + url);
     } else {
       this.preview = false;
@@ -76,33 +80,26 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
       this.lineComp.setText('Invalid URL!');
       this.logText('Invalid URL: ' + url);
     }
+
     end = new Date().getTime();
     this.logText('End Preview loading!');
     this.logText('Total time: ' + ((end - start) / 1000) + 'ms \n');
   }
 
   getData(url: string) {
-
     this.lineComp.setProgress(0.0);
     let start = (new Date().getTime());
     let end;
 
     this.lineComp.animate(0.2);
-    if (url.toString().startsWith('https://www.tripadvisor.de/')) {
+    if (url.toString().startsWith(this.urlCheck)) {
       this.logText('Start Crawling!' );
 
-
-      this.http.get('http://localhost/crawler.php?url=' + url)
+      this.http.get('http://localhost/crawlerRuntime.php?url=' + url)
                 .map(response => response.json())
                 .subscribe(result => this.data = result);
 
       this.lineComp.animate(0.8);
-      /*
-
-      this.http.get('http://localhost/crawlerStart.php')
-        .map((res: Response) => res.json())
-        .subscribe(res => this.data = res.json());
-      */
       this.logText('Crawling - URL: ' + url);
       this.lineComp.animate(1.0);
       this.lineComp.setText('Successful');
@@ -113,7 +110,6 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     end = new Date().getTime();
     this.logText('End Crawling!');
     this.logText('Total time: ' + ((end - start) / 1000) + 'ms \n');
-
   }
 
   ngAfterViewInit() {

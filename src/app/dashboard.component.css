@@ -122,8 +122,7 @@ textarea {
 
 .tooltip {
   position: relative;
-  display: inline-block;
-  /* border-bottom: 1px dotted black; */
+  display: inline;
 }
 
 .tooltip .tooltiptext {
@@ -132,8 +131,8 @@ textarea {
   background-color: black;
   color: #fff;
   text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
+  border-radius: 1px;
+  padding: 0px 0;
 
   /* Position the tooltip */
   position: absolute;
@@ -142,4 +141,15 @@ textarea {
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+
+.filterBox {
+  width: 50%;
+  float: left;
+  text-align: center;
+}
+
+.error {
+  color: red;
+
 }

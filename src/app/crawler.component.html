@@ -2,22 +2,58 @@
   <div id="crawl-component">
     <h4>Copy URL of a single Hotel to the input box and press the "Import to Database" button
     <div class="tooltip">
-      <img src="icons/qm.png" alt="Mountain View" style="width:20px;height:20px;">
+      <img src="icons/qm.png" alt="Mountain View" style="width:17px;height:17px;">
 
       <span class="tooltiptext">
-        <h6>Only www.tripadvisor.de is supported! Example URL:
-      <br/>
-      https://www.tripadvisor.de/ShowUserReviews-g187309-d201817-r471437591-Carat_Hotel_Apartments_Munchen-Munich_Upper_Bavaria_Bavaria.html
-    </h6></span>
+        <h6>
+          This tool crawls the reviews (starting from the latest) from the TripAdvisor.de web site!<br/>
+          Only www.tripadvisor.de is supported! Example URL:<br/>
+          https://www.tripadvisor.de/Hotel_Review-g187309-d279562-Reviews-Hotel_Laimer_Hof-Munich_Upper_Bavaria_Bavaria.html
+        </h6>
+      </span>
     </div>
     </h4>
+
     <form name="urlForm">
       <label>
         <input #url type="url" class="url" (input)="getPreview(url.value)" ng-model="urlText" ng-required="true" >
       </label>
-      <label>
-        Max. Runtime(seconds): <input #maxruntime ng-model="maxRuntime" type="number" ng-required="true" value="120" max="3600" min="60">
-      </label>
+      <div class="filterBox">
+        <label>
+          Max. Runtime(seconds): <input #maxruntime ng-model="maxRuntime" type="number" ng-required="true" value="120" max="3600" min="60">
+
+          <div class="tooltip">
+            <img src="icons/qm.png" alt="Mountain View" style="width:17px;height:17px;">
+
+            <span class="tooltiptext">
+              <h6>
+                Defines the maximum runtime of the crawling process. <br/>
+                If this time is rechead the crawling process stops!<br />
+                max Value = "3600"<br />
+                min Value = "60"
+              </h6>
+            </span>
+          </div>
+        </label>
+      </div>
+
+      <div class="filterBox">
+        <label>
+          Max. Reviews: <input #maxreviews ng-model="maxReviews" type="number" ng-required="true" value="1000" max="5000" min="10">
+          <div class="tooltip">
+            <img src="icons/qm.png" alt="Mountain View" style="width:17px;height:17px;">
+
+            <span class="tooltiptext">
+              <h6>
+                Defines the maximum amount of reviews should be crawled during the process. <br/>
+                If this amount is rechead the crawling process stops!<br />
+                max Value = "5000"<br />
+                min Value = "10"
+              </h6>
+            </span>
+          </div>
+        </label>
+      </div>
     </form>
   </div>
 
@@ -29,16 +65,24 @@
   <div *ngIf="preview" class="preview">
     <h4>Preview</h4>
     <ul *ngFor="let d of previewData">
-      Hotel: {{d.name}} <br />
-      Location: {{d.street}}, {{d.locality}} <br />
-      Country: {{d.country}}  <br />
-      Amount of Reviews: {{d.amountOfReviews}}  <br />
-    </ul>
-    <hr/>
-  </div>
+      <div *ngIf="d.name != ''">
+        Hotel: {{d.name}} <br />
+        Location: {{d.street}}, {{d.locality}} <br />
+        Country: {{d.country}}  <br />
+        Amount of Reviews: {{d.amountOfReviews}}  <br />
 
-  <div id="buttonBox">
-    <button id="btn_start" type="button" (click)="getData(url.value)">Import to Database</button>
+        <hr/>
+
+        <div id="buttonBox">
+          <button id="btn_start" type="button" (click)="getData(url.value)">Import to Database</button>
+        </div>
+
+      </div>
+
+      <div *ngIf="d.name == ''">
+        <div class="error">Error Loading Preview for Hotel! - Please check the URL!</div>
+      </div>
+    </ul>
   </div>
 
   <div *ngIf="debugMode" id="console">
@@ -46,7 +90,7 @@
     <div id="crawledBox">
       <ul>
         <li *ngFor="let d of data">
-          {{d.r_id}} - {{d.title}}
+          {{d.name}} - {{d.street}}
         </li>
       </ul>
     </div>
