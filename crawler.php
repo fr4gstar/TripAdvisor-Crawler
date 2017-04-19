@@ -181,21 +181,25 @@ function crawlHotel(){
 	if(is_Null($url)){
 		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " No URL in Request\n");
 		// TODO echo Rückgabe an Angular
+		echo("<br> Keine URL im Request");
 	}else if(!is_Null($maxReviews)){
 		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Crawl Request:\n");
 		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . "\t-URL: " . $url . "\n");
 		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . "\t-maxReviews: " . $maxReviews . "\n");
 		// TODO echo Rückgabe an Angular
+		echo("<br> Crawler startet mit URL und maxReviews");
 		crawlHotelMaxReviews($url, $maxReviews);
-	}else if (!is_Null($maxReviews)){
+	}else if (!is_Null($maxCrawlTime)){
 		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Crawl Request:\n");
 		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " URL: " . $url . "\n");
 		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " maxCrawlTime: " . $maxCrawlTime . "\n");
 		// TODO echo Rückgabe an Angular
+		echo("<br> Crawler startet mit URL und maxCrawlTime");
 		crawlHotelMaxCrawlTime($url, $maxCrawlTime);
 	}else{
 		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " No MaxReviews and non MaxCrawlTime in Request\n");
 		// TODO echo Rückgabe an Angular
+		echo("<br> Keine MaxCrawlTime oder MaxReviews übergeben");
 	}
 	$endzeit = time();
 	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Endtime: " . $endzeit . "\n");
@@ -242,7 +246,9 @@ function crawlReviews($url){
 		echo("<br>Nächste URL: " . $url . " Counter: " . $counter);
 		//$dom = loadDom($url);
 		$dom = new DOMDocument('1.0');
-		$dom->loadHTMLFile($url);
+		if($dom->loadHTMLFile($url) == false){
+			fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " Error on Loading DOM for URL: " . $url . "\n");
+		}
 		$url = getNextPageUrl($dom);
 		set_time_limit(20);
 		$reviewcounter = extractReviewInformation($dom, $reviewcounter);
@@ -361,11 +367,11 @@ Funktionsbeschreibung:
 		- reviewText = Text der Bewertung
 		- reviewFurtherInformation = Wer hatte den Aufenthalt wann -> TODO Format
 		- Bilder TODO
-- Die Funktion holt sich über eine Schleife alle Review ID's der Seite. Anschließend wird für
-  diese IDS ein weiterer Request an Tripadvisor gesendet. Dies muss gemacht werden, da teilweise
-  die Informationen am Browser per JavaScript Aufruf nachgeladen werden und nicht mit dem ersten
-  Request ankommen.
-- Aus dem zweiten Request werden die weiteren Informationen extrahiert.
+- Funktion crawlt den DOM Baum der Bewertungen. Anschließend extrahiert Sie die weiteren Informationen
+  aus dem DOM Baum. Problem: Ältere Reviews werden über einen extra Aufruf von der Seite nachgeladen.
+- Für den zweiten Fall werden alle Review IDs gesammelt, für die es keinen Titel und keinen Text gibt.
+  Anschließend wird für diese der zweite Aufruf simuliert und aus diesem Aufruf die benötigten 
+  Informationen extrahiert.
 
 Übergabeparameter:
 - dom = DOMDocument der Seite des Hotels
@@ -375,61 +381,34 @@ Status: 90%
 ************************************************************************************************/
 function extractReviewInformation($dom, $reviewcounter){
 	global $logdatei;
-	
-	$review = array();
-	$userName;
-	$userLocation;
-	$userRating;
-	$userGender;
-	$userAge;
-	$reviewId;
-	$reviewTitle;
-	$reviewDate;
-	$reviewRating;
-	$reviewText;
-	$reviewFurtherInformation;
-	$reviewPictures = array();
-	
-	
-	
-	// Sucht alle Review IDs
+
 	$reviewIds = array();
+	
+	// Crawlt den DOM Baum der Tripadvisor Seite
 	$divs = $dom->getElementsByTagName('div');
 	foreach($divs as $div){
 		if(strpos($div->getAttribute('class'), 'reviewSelector') !== false){
-			$reviewIds[] = substr($div ->getAttribute('id'), -(strlen($div ->getAttribute('id'))-7));	
-		}
-	}
-	
-	// Erzeugt die URL für den Request auf die Detailinformationen
-	$requestString = "https://www.tripadvisor.de/UserReviewController?a=rblock&r=";
-	/*foreach ($reviewIds as $key => $value)
-	{
-		if($key == 0){
-			$requestString = $requestString . $value;
-		}else{
-			$requestString = $requestString . ":" . $value;;
-		}
-	}
-	$requestString = $requestString . "&type=5&tr=false&n=16&d=3338551";
-	
-	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " " . count($reviewIds) . " Reviews found. \n");
-	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " RequestString for Information created: " . $requestString . "\n");
-	
-	// Lädt das DOMDocument aus dem Request String PRÜFEN BRAUCHT MAN DASS?????
-	$informationDom = new DOMDocument('1.0');
-	if($informationDom->loadHTMLFile($requestString) == false){
-		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " Error on Loading DOM for Request String : " . $requestString . "\n");
-	}
-	*/
-	
-	foreach($divs as $div){
-		if(strpos($div->getAttribute('class'), 'reviewSelector') !== false){
-			$reviewId = substr($div ->getAttribute('id'), -(strlen($div ->getAttribute('id'))-7));	
+			$review = array();
+			$userName;
+			$userLocation;
+			$userRating;
+			$userGender;
+			$userAge;
+			$reviewId;
+			$reviewTitle;
+			$reviewDate;
+			$reviewRating;
+			$reviewText;
+			$reviewFurtherInformation;
+			$reviewPictures = array();
+			
+			$reviewId = substr($div->getAttribute('id'), -(strlen($div->getAttribute('id'))-7));	
+			$reviewIds[] = $reviewId;
+			echo("<br><h2>Review ID = " . $reviewId . "</h2>");
 			$revDivs = $div->getElementsByTagName('div');
 			foreach($revDivs as $revDiv){
 				if(strpos($revDiv->getAttribute('class'), 'username') !== false){
-					$userName = $revDiv->childNodes[0]->nodeValue;
+					$userName = $revDiv->nodeValue;
 					echo("<br>User Name: ". $userName);
 				}else if(strpos($revDiv->getAttribute('class'), 'location') !== false){
 					$userLocation = $revDiv->nodeValue;
@@ -487,6 +466,11 @@ function extractReviewInformation($dom, $reviewcounter){
 				}				
 			}
 			
+			if((!is_null($reviewText) || $reviewText != "") && (!is_null($reviewTitle) || $reviewTitle != "")){
+				unset($reviewIds[array_search($reviewId, $reviewIds)]);
+			}
+		
+			
 			$review['userName'] = $userName;
 			$review['userLocation'] = $userLocation;
 			$review['reviewTitle'] = $reviewTitle;
@@ -499,7 +483,75 @@ function extractReviewInformation($dom, $reviewcounter){
 			persistReviewInformation($review);
 			
 		}
+		
+		
 	}
+	
+	echo("<br><b>Review IDs Array:</b>");
+	var_dump($reviewIds);
+	
+	// Erzeugt die URL für den Request auf die Detailinformationen
+	$requestString = "https://www.tripadvisor.de/UserReviewController?a=rblock&r=";
+	$first = true;
+	foreach ($reviewIds as $key => $value)
+	{
+		if($first){
+			$requestString = $requestString . $value;
+			$first = false;
+		}else{
+			$requestString = $requestString . ":" . $value;;
+		}
+	}
+	$requestString = $requestString . "&type=5&tr=false&n=16&d=3338551";
+	
+	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " " . count($reviewIds) . " Reviews found. \n");
+	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " RequestString for Information created: " . $requestString . "\n");
+	
+	// Lädt das DOMDocument aus dem Request String PRÜFEN BRAUCHT MAN DASS?????
+	$requestDom = new DOMDocument('1.0');
+	if($requestDom->loadHTMLFile($requestString) == false){
+		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " Error on Loading DOM for Request String : " . $requestString . "\n");
+	}
+	
+	echo("<br><h1>" . $requestString . "</h1>");
+	
+	// Crawlt den Request DOM Baum
+	$requestDivs = $requestDom->getElementsByTagName('div');
+	
+	foreach ($reviewIds as $key => $value){
+		$reviewDiv = $requestDom->getElementById("review_" . $value);
+		$review = array();
+		$userName;
+		$userLocation;
+		$userRating;
+		$userGender;
+		$userAge;
+		$reviewId;
+		$reviewTitle;
+		$reviewDate;
+		$reviewRating;
+		$reviewText;
+		$reviewFurtherInformation;
+		$reviewPictures = array();
+		
+		$reviewId = $value;	
+		echo("<br><h2>Review ID = " . $reviewId . "</h2>");
+		$revDivs = $reviewDiv->getElementsByTagName('div');
+		foreach($revDivs as $revDiv){
+			if(strpos($revDiv->getAttribute('class'), 'username') !== false){
+				$userName = $revDiv->nodeValue;
+				echo("<br>User Name: ". $userName);
+			}else if(strpos($revDiv->getAttribute('class'), 'location') !== false){
+				$userLocation = $revDiv->nodeValue;
+				echo(" - Location: " . $userLocation);
+			}else if(strpos($revDiv->getAttribute('class'), 'quote') !== false){
+				$reviewTitle = $revDiv->nodeValue;
+				echo(" - Titel: " . $reviewTitle);
+			}
+		}
+	}
+	
+	
 	
 	//echo("<h1>");
 	//var_dump($reviews);
@@ -577,11 +629,12 @@ Funktionsbeschreibung:
 Status: 0%
 ************************************************************************************************/
 function persistHotelInformation($hotelName, $hotelRating, $hotelReviews, $hotelStreet, $hotelPostalCode, $hotelLocality, $hotelRegion, $hotelCountry){
-	echo($hotelName);
-	echo($hotelRating);
-	echo($hotelReviews);
-	echo($hotelStreet . $hotelPostalCode . $hotelLocalit . $hotelRegion . $hotelCountry);
-	
+	echo("<br><h1>HotelInformationen</h1>");
+	echo("<br>".$hotelName);
+	echo("<br>".$hotelRating);
+	echo("<br>".$hotelReviews);
+	echo("<br>".$hotelStreet .", ". $hotelPostalCode .", ".  $hotelLocality .", ". $hotelRegion .", ". $hotelCountry);
+	echo("<br><h1>Bewertungsinformationen</h1>");
 	//TODO
 }
 
@@ -591,11 +644,7 @@ Funktionsbeschreibung:
 
 Status: 0%
 ************************************************************************************************/
-function persistReviewInformation($hotelName, $hotelRating, $hotelReviews, $hotelStreet, $hotelPostalCode, $hotelLocality, $hotelRegion, $hotelCountry){
-	echo($hotelName);
-	echo($hotelRating);
-	echo($hotelReviews);
-	echo($hotelStreet . $hotelPostalCode . $hotelLocalit . $hotelRegion . $hotelCountry);
+function persistReviewInformation(){
 	
 	//TODO
 }
