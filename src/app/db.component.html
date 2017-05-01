@@ -1,28 +1,23 @@
 <div>
-  <h4> Crawled items in the Database</h4>
+  <!-- <h4> Crawled items in the Database</h4> -->
 
-  <generic-table [gtClasses]="'table-sm'" #myTable [gtSettings]="configObject.settings" [gtFields]="configObject.fields" [(gtData)]="configObject.data"></generic-table>
-  <div class="text-center">
-    <small><gt-table-info class="form-text text-muted mb-2" [genericTable]="myTable"></gt-table-info></small>
-    <gt-pagination [gtClasses]="'pagination-sm justify-content-center'" [genericTable]="myTable"></gt-pagination>
-  </div>
   <div id="db-component">
+    <h4>Export the imported data as csv
+      <div class="tooltip">
+        <img src="icons/qm.png" alt="Mountain View" style="width:17px;height:17px;">
 
-    <!--
-            <h4>1. Copy URL of single Hotel to the input box and press the "Start" button</h4>
+        <span class="tooltiptext">
+        <h6>
+          This function exports all entries in the database as csv.
+        </h6>
+      </span>
+      </div>
+    </h4>
 
-            <form name="urlForm" (ng-submit)="getData()">
-              <label>
-                <input #url type="url" class="url" ng-model="urlText" ng-required="true" >
-              </label>
-              <button id="btn_start" type="button" (click)="getData(url.value)">Start</button>
-            </form>
-
-            <!-- <div *ngFor="let person of data | async"
-                    (click)="getData()" class="search-result" >
-                 {{person.first_name}}
-             </div>
-             -->
-
+    <div id="buttonBox">
+      <form action="http://localhost/csvexport.php" method="get">
+        <button id="btn_start" type="submit">Export To CSV</button>
+      </form>
+    </div>
   </div>
 </div>

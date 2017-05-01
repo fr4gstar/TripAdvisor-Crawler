@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import {GtConfig} from 'angular-generic-table/generic-table/interfaces/gt-config';
+import {Http} from '@angular/http';
 
 @Component({
   selector: 'my-db',
   templateUrl: './db.component.html',
-  styleUrls: [ './db.component.css' ]
+  styleUrls: [ './dashboard.component.css' ]
 })
 export class DBComponent implements OnInit {
 
@@ -15,7 +16,7 @@ export class DBComponent implements OnInit {
     title: string
   }> = [];
 
-  constructor() {
+  constructor(private http: Http) {
     this.configObject = {
       settings: [{
         objectKey: 'r_id',

@@ -95,7 +95,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     if (url.toString().startsWith(this.urlCheck)) {
       this.logText('Start Crawling!' );
 
-      this.http.get('http://localhost/crawlerRuntime.php?url=' + url)
+      this.http.get('http://localhost/crawler.php?url=' + url)
                 .map(response => response.json())
                 .subscribe(result => this.data = result);
 

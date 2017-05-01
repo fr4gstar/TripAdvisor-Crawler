@@ -1,6 +1,6 @@
 <div>
   <div id="crawl-component">
-    <h4>Copy URL of a single Hotel to the input box and press the "Import to Database" button
+    <h4>Copy an URL of a single Hotel to the input box and press the "Import to Database" button
     <div class="tooltip">
       <img src="icons/qm.png" alt="Mountain View" style="width:17px;height:17px;">
 
@@ -18,6 +18,7 @@
       <label>
         <input #url type="url" class="url" (input)="getPreview(url.value)" ng-model="urlText" ng-required="true" >
       </label>
+      <!--
       <div class="filterBox">
         <label>
           Max. Runtime(seconds): <input #maxruntime ng-model="maxRuntime" type="number" ng-required="true" value="120" max="3600" min="60">
@@ -54,6 +55,7 @@
           </div>
         </label>
       </div>
+      -->
     </form>
   </div>
 
@@ -65,7 +67,7 @@
   <div *ngIf="preview" class="preview">
     <h4>Preview</h4>
     <ul *ngFor="let d of previewData">
-      <div *ngIf="d.name != ''">
+      <div *ngIf="d.name != '' && d.street != '' && d.locality != '' && d.country != '' && d.amountOfReviews != ''">
         Hotel: {{d.name}} <br />
         Location: {{d.street}}, {{d.locality}} <br />
         Country: {{d.country}}  <br />
@@ -79,7 +81,7 @@
 
       </div>
 
-      <div *ngIf="d.name == ''">
+      <div *ngIf="d.name == '' || d.street == '' || d.locality == '' || d.country == '' || d.amountOfReviews == ''">
         <div class="error">Error Loading Preview for Hotel! - Please check the URL!</div>
       </div>
     </ul>
@@ -89,8 +91,9 @@
     <h4>Crawled items</h4>
     <div id="crawledBox">
       <ul>
-        <li *ngFor="let d of data">
-          {{d.name}} - {{d.street}}
+        <li *ngFor="let result of data">
+          Type: {{result.type}} <br />
+          Message: {{result.message}}
         </li>
       </ul>
     </div>
