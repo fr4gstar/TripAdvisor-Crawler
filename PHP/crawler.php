@@ -133,7 +133,7 @@ function insertDatabase($id, $ueberschrift, $bewertung){
 
 /*----------------------------------------------------- Neuer Teil -----------------------------------------------*/
 // Test URL: https://www.tripadvisor.de/Hotel_Review-g187309-d279562-Reviews-Hotel_Laimer_Hof-Munich_Upper_Bavaria_Bavaria.html
-
+/***********************************************************************************************/
 /************************************************************************************************
 Autor: Andreas Geyer, andreas.geyer@geyer-net.de / ageyer@hm.edu
 Datum: 14.04.2017
@@ -149,13 +149,14 @@ Sonstiges:
 - Nur Errors werden gemeldet
 - Datei ruft die Funktion crawlHotel immer auf
 ************************************************************************************************/
+/***********************************************************************************************/
 
 $logdatei;
 error_reporting(E_ERROR | E_PARSE);
 
-
-
 crawlHotel();
+
+//echo(getImageUrl('https://www.tripadvisor.de/Hotel_Review-g187309-d279562-Reviews-Hotel_Laimer_Hof-Munich_Upper_Bavaria_Bavaria.html'));
 
 
 
@@ -168,38 +169,33 @@ Funktionsbeschreibung:
 	- maxCrawlTime: Zeit die maximal gecrawlt werden soll
 - Es wird lediglich maxReviews oder maxCrawlTime übergeben
 - Erzeugt die Logdatei und stellt Sie zum Schrieben für die weiteren Funktionen bereit
+
+Status: 100%
 ************************************************************************************************/
 function crawlHotel(){
 	global $logdatei;
 	
 	$url = $_GET["url"];
-	$maxReviews = $_GET["maxReviews"];
-	$maxCrawlTime = $_GET["maxCrawlTime"];
 	$logdatei=fopen("logs/crawlerlog_" . time() . ".txt","a");
 	$startzeit = time();
 	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Starttime: ". $startzeit . "\n");
 	if(is_Null($url)){
 		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " No URL in Request\n");
-		// TODO echo Rückgabe an Angular
 		echo("<br> Keine URL im Request");
-	}else if(!is_Null($maxReviews)){
-		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Crawl Request:\n");
-		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . "\t-URL: " . $url . "\n");
-		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . "\t-maxReviews: " . $maxReviews . "\n");
-		// TODO echo Rückgabe an Angular
-		echo("<br> Crawler startet mit URL und maxReviews");
-		crawlHotelMaxReviews($url, $maxReviews);
-	}else if (!is_Null($maxCrawlTime)){
-		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Crawl Request:\n");
-		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " URL: " . $url . "\n");
-		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " maxCrawlTime: " . $maxCrawlTime . "\n");
-		// TODO echo Rückgabe an Angular
-		echo("<br> Crawler startet mit URL und maxCrawlTime");
-		crawlHotelMaxCrawlTime($url, $maxCrawlTime);
 	}else{
-		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " No MaxReviews and non MaxCrawlTime in Request\n");
-		// TODO echo Rückgabe an Angular
-		echo("<br> Keine MaxCrawlTime oder MaxReviews übergeben");
+		$dom = loadDom($url);
+		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Begin Crawling Hotel Information\n");
+		extractHotelInformation($dom);
+		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Finished Crawling Hotel Information\n");
+		$reviewUrl = getFirstReviewUrl($dom);
+		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " First Review URL identified\n");
+		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Begin Crawling Review Information\n");
+		crawlReviews($reviewUrl);
+		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Finished Crawling Review Information\n");
+		$imageUrl = getImageUrl($url);
+		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Begin Crawling Review Images\n");
+		crawlImages($imageUrl);
+		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Finished Crawling Review Images\n");
 	}
 	$endzeit = time();
 	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Endtime: " . $endzeit . "\n");
@@ -207,22 +203,18 @@ function crawlHotel(){
 	fclose($logdatei);
 }
 
+/************************************************************************************************
+Funktionsbeschreibung:
+- Lädt die URL der ersten Review (Vergleibar mit Klick auf die erste Bewertung
 
-function crawlHotelMaxReviews($url, $maxReviews){
-	global $logdatei;
-	$dom = loadDom($url);
-	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Begin Crawling Hotel Information\n");
-	extractHotelInformation($dom);
-	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Finished Crawling Hotel Information\n");
-	$url = getFirstReviewUrl($dom);
-	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " First Review URL identified\n");
-	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Begin Crawling Review Information\n");
-	crawlReviews($url);
-	fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " Finished Crawling Review Information\n");
-}
+Übergabeparameter:
+- DOM Baum der Initialen Seite
 
+Rückgabeparameter:
+- Erste Review URL
 
-//Wird noch benötigt weil sonst die Schleife nicht richtig durchläuft -> zu untersuchen
+Status: 100%
+************************************************************************************************/
 function getFirstReviewUrl($dom){
 	$nextUrl = "";
 	$divs = $dom->getElementsByTagName('div');
@@ -235,8 +227,47 @@ function getFirstReviewUrl($dom){
 	return $nextUrl;
 }
 
+/************************************************************************************************
+Funktionsbeschreibung:
+- Ermittelt die URL zum Laden der Bilder aus der Hotel URL
+- Extrahiert hierfür die Detail und Geo Variable aus der URL
+- Beispielhaftes Ergebnis:
+	https://www.tripadvisor.de/MetaPlacementAjax?detail=279562&placementName=media_albums&
+	servletClass=com.TripResearch.servlet.LocationPhotoAlbum&servletName=LocationPhotoAlbum&
+	geo=187309&albumViewMode=images&cnt=1000000&offset=0
+- limit Variable gibt an wie viele Bilder maximal geholt werden sollen
 
+Übergabeparameter:
+- DOM Baum der Initialen Seite
 
+Rückgabeparameter:
+- URL für den Image Request
+
+Status: 100%
+************************************************************************************************/
+function getImageUrl($url){
+	$limit = '9999999999';
+	$imageUrl = '';
+	$detail = substr($url, stripos($url, '-d')+2);
+	$detail = substr($detail, 0, stripos($detail, '-'));
+	$geo = substr($url, stripos($url, '-g')+2);
+	$geo = substr($geo, 0, stripos($geo, '-'));
+	$imageUrl = 'https://www.tripadvisor.de/MetaPlacementAjax?detail=' . $detail 
+		. '&placementName=media_albums&servletClass=com.TripResearch.servlet.LocationPhotoAlbum&servletName=LocationPhotoAlbum&geo=' . $geo 
+		. '&albumViewMode=images&cnt=' . $limit . '&offset=0';
+	
+	return $imageUrl;
+}
+
+/************************************************************************************************
+Funktionsbeschreibung:
+- Steuert die Funktionalität des Crawlers
+- Ruft die Funktion zum Extrahieren der Daten ab
+- Lädt die nächste URL der nächsten Reviewseite
+	- url: URL der ersten Reviewseite
+
+Status: 100%
+************************************************************************************************/
 function crawlReviews($url){
 	global $logdatei;
 	$counter= 1;
@@ -244,7 +275,6 @@ function crawlReviews($url){
 	while($url != "finished"){
 		fputs($logdatei, "Info - " .date("Y-m-d H:i:s") . " " . $counter . ". Next URL: " . $url . "\n");
 		echo("<br>Nächste URL: " . $url . " Counter: " . $counter);
-		//$dom = loadDom($url);
 		$dom = new DOMDocument('1.0');
 		if($dom->loadHTMLFile($url) == false){
 			fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " Error on Loading DOM for URL: " . $url . "\n");
@@ -254,11 +284,15 @@ function crawlReviews($url){
 		$reviewcounter = extractReviewInformation($dom, $reviewcounter);
 		$counter++;
 	}
-	
 	echo("<br>Fertig!<br>");
 }
 
+/************************************************************************************************
+Funktionsbeschreibung:
+- Lädt die nächste Bewertungsseiten URL aus dem DOM Baum
 
+Status: 100%
+************************************************************************************************/
 function getNextPageUrl($dom){
 	$nextUrl="";
 	//echo($dom->saveHtml());
@@ -275,11 +309,6 @@ function getNextPageUrl($dom){
 	}
 	return $nextUrl;
 }
-
-function crawlHotelMaxCrawlTime($url, $maxCrawlTime){
- //TODO
-}
-
 
 /************************************************************************************************
 Funktionsbeschreibung:
@@ -301,52 +330,54 @@ Funktionsbeschreibung:
 Status: 90%
 ************************************************************************************************/
 function extractHotelInformation($dom){
-	$hotelName;
-	$hotelRating;
-	$hotelReviews;
-	$hotelStreet;
-	$hotelPostalCode;
-	$hotelLocality;
-	$hotelRegion;
-	$hotelCountry;
+	$hotel = array();
 	
 	// Extrahiert den Hotelnamen
 	$headings = $dom->getElementsByTagName('h1');
+	
+	// TODO ID AUS WEBSITE ZIEHEN
 	foreach($headings as $head){
 		if($head->getAttribute('id') == 'HEADING'){
-			$hotelName = $head->nodeValue;
+			$hotel['name'] = $head->nodeValue;
+		}
+	}
+	// Extrahiert die Anzahl der Bewertungen
+	$ankers = $dom->getElementsByTagName('a');
+	foreach($ankers as $anker){
+		if($anker->getAttribute('property') == 'reviewCount'){
+			$hotel['amountOfReviews'] = $head->getAttribute('content');;
 		}
 	}
 	// Extrahiert das Rating, und die Adresse
 	$spans = $dom->getElementsByTagName('span');
 	foreach($spans as $span){
 		if($span->getAttribute('property') == 'ratingValue'){
-			$hotelRating = $span->getAttribute('content');
+			$hotel['rating'] = $span->getAttribute('content');
 		}
 		if($span->getAttribute('property') == 'streetAddress'){
-			$hotelStreet = $span->nodeValue;
+			$hotel['street'] = $span->nodeValue;
 		}
 		if($span->getAttribute('property') == 'postalCode'){
-			$hotelPostalCode = $span->nodeValue;
+			$hotel['postalCode'] = $span->nodeValue;
 		}
 		if($span->getAttribute('property') == 'addressLocality'){
-			$hotelLocality = $span->nodeValue;
+			$hotel['locality'] = $span->nodeValue;
 		}
 		if($span->getAttribute('property') == 'addressRegion'){
-			$hotelRegion = $span->nodeValue;
+			$hotel['region'] = $span->nodeValue;
 		}
 		if($span->getAttribute('property') == 'addressCountry'){
-			$hotelCountry = $span->nodeValue;
+			$hotel['country'] = $span->nodeValue;
 		}
 	}
 	// Extrahiert die Anzahl an Bewertungen
 	$ankers = $dom->getElementsByTagName('a');
 	foreach($ankers as $anker){
 		if($anker->getAttribute('property') == 'reviewCount'){
-			$hotelReviews = $anker->getAttribute('content');
+			$hotel['reviews'] = $anker->getAttribute('content');
 		}
 	}
-	persistHotelInformation($hotelName, $hotelRating, $hotelReviews, $hotelStreet, $hotelPostalCode, $hotelLocality, $hotelRegion, $hotelCountry);
+	persistHotelInformation($hotel);
 }
 
 /************************************************************************************************
@@ -436,26 +467,6 @@ function extractReviewInformation($dom, $reviewcounter){
 				} else if(strpos($revSpan->getAttribute('class'), 'recommend-titleInline noRatings') !== false){
 					$reviewFurtherInformation = $revSpan->nodeValue;
 					echo("<br>Weitere Infos: ". $reviewFurtherInformation);
-				} else if(strpos($revSpan->getAttribute('class'), 'LocationPhotoDirectLink') !== false){
-					echo("<br>Bei dem Review wurde ein Foto gefunden");
-					// Extrahiert die Informationen aus dem Onclick Call
-					$onclick= $revSpan->getAttribute('onclick');
-					$detail = substr($onclick, strpos($onclick, 'detail'));
-					$detail = substr($detail, 0, strpos($detail, ','));
-					$detail = substr($detail, strpos($detail, ':')+1);
-					$geo = substr($onclick, strpos($onclick, 'geo'));
-					$geo = substr($geo, 0, strpos($geo, ','));
-					$geo = substr($geo, strpos($geo, ':')+1);
-					$filter = substr($onclick, strpos($onclick, 'filter'));
-					$filter = substr($filter, 0, strpos($filter, ','));
-					$filter = substr($filter, strpos($filter, ':')+1);
-					$imageId = substr($onclick, strpos($onclick, 'imageId'));
-					$imageId = substr($imageId, 0, strpos($imageId, '}'));
-					$imageId = substr($imageId, strpos($imageId, ':')+1);
-					$imageUrl = extractReviewPicture($detail, $geo, $filter, $imageId);
-					$reviewPictures[] = $imageUrl;
-					echo("<br>Bild Url: " . $imageUrl);
-				}
 			}
 			
 			$revParagraphs = $div->getElementsByTagName('p');
@@ -468,23 +479,19 @@ function extractReviewInformation($dom, $reviewcounter){
 			
 			if((!is_null($reviewText) || $reviewText != "") && (!is_null($reviewTitle) || $reviewTitle != "")){
 				unset($reviewIds[array_search($reviewId, $reviewIds)]);
+			}else{
+				$review['userName'] = $userName;
+				$review['userLocation'] = $userLocation;
+				$review['reviewTitle'] = $reviewTitle;
+				$review['reviewDate'] = $reviewDate;
+				$review['reviewRating'] = $reviewRating;
+				$review['reviewText'] = $reviewText;
+				$review['reviewFurtherInformation'] = $reviewFurtherInformation;
+				$review['reviewPictures'] = $reviewPictures;
+				
+				persistReviewInformation($review);
 			}
-		
-			
-			$review['userName'] = $userName;
-			$review['userLocation'] = $userLocation;
-			$review['reviewTitle'] = $reviewTitle;
-			$review['reviewDate'] = $reviewDate;
-			$review['reviewRating'] = $reviewRating;
-			$review['reviewText'] = $reviewText;
-			$review['reviewFurtherInformation'] = $reviewFurtherInformation;
-			$review['reviewPictures'] = $reviewPictures;
-			
-			persistReviewInformation($review);
-			
 		}
-		
-		
 	}
 	
 	echo("<br><b>Review IDs Array:</b>");
@@ -549,45 +556,77 @@ function extractReviewInformation($dom, $reviewcounter){
 				echo(" - Titel: " . $reviewTitle);
 			}
 		}
+		
+		$revParagraphs = $reviewDiv->getElementsByTagName('p');
+		foreach($revParagraphs as $revParagraph){
+			if(strpos($revParagraph->getAttribute('id'), 'review_' . $reviewId) !== false){
+				$reviewText = $revParagraph->nodeValue;
+				echo("<br>Review Text: ". $reviewText);
+			}				
+		}
+		
 	}
-	
-	
-	
-	//echo("<h1>");
-	//var_dump($reviews);
-	//echo("</h1>");
-	
-	
-	
-	
-	
-	
-	
-	
-	//echo("<br>" . $requestString);
-	// echo("<br>Reviewcounter: " . $reviewcounter . " - ID: " . $reviewId);
-	// Vorlage: https://www.tripadvisor.de/UserReviewController?a=rblock&r=184959210&type=5&tr=false&n=16&d=3338551
 
-	//echo("<code>" . str_replace('>','&gt;',str_replace('<', '&lt;', $informationDom->saveHTML())) . "</code>" );
-	//echo("https://www.tripadvisor.de/UserReviewController?a=rblock&r=" . $revString . "&type=5&tr=false&n=16&d=3338551");
 	flush();
 	ob_flush();
 	return $reviewcounter;
+}
+
+
+/************************************************************************************************
+Funktionsbeschreibung:
+- Crawlt die Seite der Bild URL um die Bilder zu erkennen
+- Ruft die Funktion zum Extrahieren der Bilder ab
+
+- Übergabeparameter
+	- url: URL für den Requerst der Bilder
+Status: 100%
+************************************************************************************************/
+function crawlImages($url){
+	$dom = new DOMDocument('1.0');
+	if($dom->loadHTMLFile($url) == false){
+		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " Error on Loading DOM for URL: " . $url . "\n");
+	}
+	// Anker in dem sich die Bilder befinden
+	$ankers = $dom->getElementsByTagName('a');
+	foreach($ankers as $anker){
+		$data = $anker->getAttribute('data-href');
+		$detail = substr($data, stripos($data, 'detail=')+7);
+		$detail = substr($detail, 0, stripos($detail, '&'));
+		$geo = substr($data, stripos($data, 'geo=')+4);
+		$geo = substr($geo, 0, stripos($geo, '&'));
+		$filter = substr($data, stripos($data, 'filter=')+7);
+		$imageId = substr($data, stripos($data, 'ff=')+3);
+		$imageId = substr($imageId, 0, stripos($imageId, '&'));
+		
+		$image = extractReviewPicture($detail, $geo, $filter, $imageId);
+		persistReviewImages($image);
+		// Ausgabe im Brwoser
+		echo($image['image'] . " von User " . $image['user'] . "<br>");
+		flush();
+		ob_flush();
+	}
 }
 
 /************************************************************************************************
 Funktionsbeschreibung:
 - Baut einen Request auf um die Bilder zu exportieren, da diese per JavaScript im Browser nach
   geladen werden
-- Extrahiert die URL der jeweiligen Bilder und gibt diese zurück
+- Extrahiert die URL der jeweiligen Bilder und gibt diese zurück mit der jeweiligen UserID
 
 Übergabeparameter:
 - Parameter, mit denen man das Bild eindeutig identifzieren kann (vgl. Aufruf in der Funktion)
+
+Rückgabewert:
+- Array ( $reviewImg ) das den User und die Bild URL beinhaltet:
+	- $reviewImg['user'] beinhaltet die UserID
+	- $reviewImg['image'] beinhaltet die Bild URL
 
 Status: 100%
 ************************************************************************************************/
 function extractReviewPicture($detail, $geo, $filter, $imageId){
 	global $logdatei;
+	set_time_limit(20);
 	//Ganzer String:	https://www.tripadvisor.de/LocationPhotoAlbum?detail=279562&geo=187309&filter=2&imageId=249186460&heroMinWidth=1141&heroMinHeight=719&ff=249186460&albumid=101&albumViewMode=hero&albumPartialsToUpdate=full&thumbnailMinWidth=50&cnt=30&offset=-5&baseMediaId=249186460&extraAlbumCoverCount=2&area=QC_Meta_Mini%7CPhoto_Lightbox&metaReferer=ShowUserReviews&metaRequestTiming=1492187292194
 	//Notwendige Teile: https://www.tripadvisor.de/LocationPhotoAlbum?detail=279562&geo=187309&filter=2&imageId=249186460&ff=249186460&albumViewMode=hero
 	$requestString = 'https://www.tripadvisor.de/LocationPhotoAlbum';
@@ -597,22 +636,31 @@ function extractReviewPicture($detail, $geo, $filter, $imageId){
 	$requestString = $requestString . '&imageId=' . $imageId;
 	$requestString = $requestString . '&ff=' . $imageId;
 	$requestString = $requestString . '&albumViewMode=hero';
-	
-	$reviewImg;
+
+	$reviewImg = array();
 	
 	$dom = new DOMDocument('1.0');
 	if($dom->loadHTMLFile($requestString) == false){
 		fputs($logdatei, "Error - " .date("Y-m-d H:i:s") . " Error on Loading DOM for Image Request String : " . $requestString . "\n");	
 	}
-	
+	// Extrahiert die Bild URL
 	$divs = $dom->getElementsByTagName('div');
 	foreach($divs as $div){
 		if(strpos($div->getAttribute('class'), 'mainImg') !== false){
 			//$reviewImg = $div->childNodes[0]->getAttribute('src');	
 			$imgs = $div->getElementsByTagName('img');
 			foreach($imgs as $img){
-				$reviewImg = $img->getAttribute('src');
+				$reviewImg['image'] = $img->getAttribute('src');
 			}
+		}
+	}
+	// Extrahiert die User ID
+	$ankers = $dom->getElementsByTagName('a');
+	foreach($ankers as $anker){
+		if(strpos($anker->getAttribute('href'), '/ShowUserReviews') !== false){
+			$href = $anker->getAttribute('href');
+			$userid = substr($href, stripos($href, '#UR')+3);
+			$reviewImg['user'] = $userid;
 		}
 	}
 	return $reviewImg;
@@ -628,14 +676,33 @@ Funktionsbeschreibung:
 
 Status: 0%
 ************************************************************************************************/
-function persistHotelInformation($hotelName, $hotelRating, $hotelReviews, $hotelStreet, $hotelPostalCode, $hotelLocality, $hotelRegion, $hotelCountry){
-	echo("<br><h1>HotelInformationen</h1>");
+function persistHotelInformation($hotel){
+/*	echo("<br><h1>HotelInformationen</h1>");
 	echo("<br>".$hotelName);
 	echo("<br>".$hotelRating);
 	echo("<br>".$hotelReviews);
 	echo("<br>".$hotelStreet .", ". $hotelPostalCode .", ".  $hotelLocality .", ". $hotelRegion .", ". $hotelCountry);
-	echo("<br><h1>Bewertungsinformationen</h1>");
+	echo("<br><h1>Bewertungsinformationen</h1>");*/
 	//TODO
+	$query = 
+	'INSERT INTO TA_HOTEL (HotelID, HotelName, HotelLocation, HotelRating, AmountOfReviews, HotelRank, HotelCreationDate, HotelUpdateDate)
+	VALUES (' . $hotel['id'] . ', ' . $hotel['name'] . ', ' . hotel['location'] .', 2 , 3, 4, now(), now())
+	ON DUPLICATE KEY 
+		UPDATE HotelName='test',HotelLocation='Deutschland', HotelRating=6, AmountOfReviews=19, HotelRank=10, HotelCreationDate=HotelCreationDate, HotelUpdateDate=now()';
+	/*INSERT INTO table (a,b,c) VALUES (1,2,3)
+  ON DUPLICATE KEY UPDATE c=c+1;*/
+/*	INSERT INTO TA_HOTEL (HotelID, HotelName, HotelLocation, HotelRating, AmountOfReviews, HotelRank, HotelCreationDate, HotelUpdateDate)
+	VALUES (1, 'test', 'Test', 2 , 3, 4, now(), now()
+	ON DUPLICATE KEY 
+		UPDATE HotelName='test',HotelLocation='Deutschland', HotelRating=6, AmountOfReviews=19, HotelRank=1, HotelUpdateDate=now()*/
+  /*HotelID numeric PRIMARY key,
+HotelName varchar (255),
+HotelLocation varchar (255),
+HotelRating numeric,
+AmountofReviews numeric,
+HotelRank numeric,
+HotelCreationDate timestamp,
+HotelUpdateDate timestamp*/
 }
 
 /************************************************************************************************
@@ -649,7 +716,47 @@ function persistReviewInformation(){
 	//TODO
 }
 
+/************************************************************************************************
+Funktionsbeschreibung:
+- Schreibt die Daten in die Datenbank
 
+Status: 0%
+************************************************************************************************/
+function persistReviewImages($image){
+	
+	//TODO
+}
+
+
+function connectToDB(){
+	$servername = "localhost";
+	$username = "root";
+	$password = "";
+	$dbname = "crawler";
+
+	// Create connection
+	$conn = new mysqli($servername, $username, $password, $dbname);
+	// Check connection
+	if ($conn->connect_error) {
+		die("Connection failed: " . $conn->connect_error);
+	}
+	return $conn;
+/*
+	$sql = "INSERT INTO bewertung (bewertungsid, ueberschrift, bewertung)
+	VALUES ('". $id . "', '" . $ueberschrift . "', '" . $bewertung . "')";
+
+	if ($conn->query($sql) === TRUE) {
+		echo "New record created successfully";
+	} else {
+		echo "Error: " . $sql . "<br>" . $conn->error;
+	}
+
+	$conn->close();*/
+}
+
+function closeConnection($conn){
+	$conn->close();
+}
 function loadDom($url){
 	$data = array('filterLang' => 'ALL');
 	$options = array(
