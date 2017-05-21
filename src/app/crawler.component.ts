@@ -34,11 +34,14 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   };
 
   private preview = false;
+  private previewCity = false;
   private data = '';
   private previewData = '';
+  private previewCityData = '';
   private logNr: number = 0;
   private log: string = '';
   private urlCheck: string = 'https://www.tripadvisor.de/Hotel_Review-g';
+  private urlCityCheck: string = 'https://www.tripadvisor.de/Hotels-g';
   // Switch to Debug Mode with Console
   private debugMode: boolean = false;
 
@@ -57,19 +60,34 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   getPreview(url: string) {
     let start = (new Date().getTime());
     let end;
+
     if (url.toString() === '') {
       this.preview = false;
       this.lineComp.setProgress(0.0);
       this.lineComp.setText('Waiting for URL!');
       this.logText('Waiting for URL!');
+    } else if (url.toString().startsWith(this.urlCityCheck)) {
+      this.logText('Start Preview Loading for City!' );
+      this.logText('URL is valid!' );
+
+      this.http.get('http://localhost/preview.php?url=' + url + '&type=city')
+        .map(response => response.json())
+        .subscribe(result => this.previewCityData = result);
+
+      this.preview = false;
+      this.previewCity = true;
+      this.lineComp.animate(0.0);
+      this.lineComp.setText('Check Preview!');
+      this.logText('Preview loading - URL: ' + url);
     } else if (url.toString().startsWith(this.urlCheck)) {
       this.logText('Start Preview Loading!' );
       this.logText('URL is valid!' );
 
-      this.http.get('http://localhost/preview.php?url=' + url)
+      this.http.get('http://localhost/preview.php?url=' + url + '&type=hotel')
                 .map(response => response.json())
                 .subscribe(result => this.previewData = result);
 
+      this.previewCity = false;
       this.preview = true;
       this.lineComp.animate(0.0);
       this.lineComp.setText('Check Preview!');
@@ -95,9 +113,20 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     if (url.toString().startsWith(this.urlCheck)) {
       this.logText('Start Crawling!' );
 
-      this.http.get('http://localhost/crawler.php?url=' + url)
+      this.http.get('http://localhost/crawler.php?url=' + url + '&type=hotel')
                 .map(response => response.json())
                 .subscribe(result => this.data = result);
+
+      this.lineComp.animate(0.8);
+      this.logText('Crawling - URL: ' + url);
+      this.lineComp.animate(1.0);
+      this.lineComp.setText('Successful');
+    } else if (url.toString().startsWith(this.urlCityCheck)) {
+      this.logText('Start City Crawling!' );
+
+      this.http.get('http://localhost/crawler.php?url=' + url + '&type=city')
+        .map(response => response.json())
+        .subscribe(result => this.data = result);
 
       this.lineComp.animate(0.8);
       this.logText('Crawling - URL: ' + url);

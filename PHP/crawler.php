@@ -19,7 +19,7 @@ Sonstiges:
 /***********************************************************************************************/
 
 $logdatei;
-$debug = 1;
+$debug = 0;
 error_reporting(E_ERROR | E_PARSE);
 
 crawlHotel();

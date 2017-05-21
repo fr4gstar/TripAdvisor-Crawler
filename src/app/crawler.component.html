@@ -72,6 +72,23 @@
         Location: {{d.street}}, {{d.locality}} <br />
         Country: {{d.country}}  <br />
         Amount of Reviews: {{d.amountOfReviews}}  <br />
+        <hr/>
+
+        <div id="buttonBox">
+          <button id="btn_start" type="button" (click)="getData(url.value)">Import to Database</button>
+        </div>
+      </div>
+
+      <div *ngIf="d.name == '' || d.street == '' || d.locality == '' || d.country == '' || d.amountOfReviews == ''">
+        <div class="error">Error Loading Preview for Hotel! - Please check the URL!</div>
+      </div>
+    </ul>
+  </div>
+  <div *ngIf="previewCity" class="preview">
+    <ul *ngFor="let c of previewCityData">
+      <div *ngIf="c.city != '' && c.amountOfHotels != ''">
+        {{c.city}} <br />
+        <!-- Amount of Hotels: {{c.amountOfHotels}} <br /> -->
 
         <hr/>
 
@@ -81,8 +98,8 @@
 
       </div>
 
-      <div *ngIf="d.name == '' || d.street == '' || d.locality == '' || d.country == '' || d.amountOfReviews == ''">
-        <div class="error">Error Loading Preview for Hotel! - Please check the URL!</div>
+      <div *ngIf="c.city == ''">
+        <div class="error">Error Loading Preview for City! - Please check the URL!</div>
       </div>
     </ul>
   </div>
