@@ -5,11 +5,11 @@
      Datum: 30.04.2017
      
      Programmbeschreibung:
-     Lädt eine Vorschau zu einer Tripadvisor URL.
+     Lädt eine Vorschau zu einer Tripadvisor URL und gibt das Ergebnis als JSON aus.
      
      ************************************************************************************************/
     /***********************************************************************************************/
-header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Origin: *");
     $url = $_GET["url"];
     
     if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
@@ -73,38 +73,22 @@ header("Access-Control-Allow-Origin: *");
                 $as = $element->getElementsByTagName('a');
                 $spans = $element->getElementsByTagName('span');
                 $divs = $element->getElementsByTagName('h1');
-                
-                
-                foreach($spans as $span){
-                    if($span->getAttribute('class') == 'tab_count'){
-                        $amountOfHotels = $span->nodeValue;
-                    };
-                    /*
-                    if($span->getAttribute('class') == 'locality'){
-                        $city = $span->nodeValue;
-                    };
-                 */
-                };
-            /*
-                foreach($as as $a){
-                    if($a->getAttribute('class') == 'more taLnk'){
-                        $amountOfReviews = $a->nodeValue;
-                    };
-                };
-                 */
-                
+                $divs2 = $element->getElementsByTagName('div');
+
                 foreach($divs as $div){
                     if($div->getAttribute('id') == 'HEADING'){
                         $city = $div->nodeValue;
                     };
                 };
+                
+                foreach($divs2 as $div){
+                    if($div->getAttribute('class') == 'tab tab0 current cat_1 header_tab  start selected sprite-tab-active'){
+                        $amountOfHotels = $div ->nodeValue;
+                    };
+                };
             };
-            
             array_push($data, array('city' => $city, '$amountOfHotels' => $amountOfHotels));
-            
         }
-            
-            
         echo json_encode($data);
     }
     error_reporting(E_ERROR | E_PARSE);
