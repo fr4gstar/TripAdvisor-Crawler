@@ -9,7 +9,9 @@ import { CrawlerComponent }   from './crawler.component';
 import { DBComponent }   from './db.component';
 import { HttpModule, JsonpModule } from '@angular/http';
 import { GenericTableModule } from 'angular-generic-table';
+import { enableProdMode } from '@angular/core';
 
+enableProdMode();
 @NgModule({
   imports:      [
                     BrowserModule,

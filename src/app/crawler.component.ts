@@ -4,8 +4,14 @@ import {
   ShapeOptions,
   LineProgressComponent} from 'angular2-progressbar';
 import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/catch';
-// import 'rxjs/Rx';
+
+/**
+ * Author: Sergej Bardin / bardin@hm.edu
+ * Crawler Component:
+ * - UI for the Tripadvisor Crawler
+ * - Starting the php script for preview of tripadvisor link
+ * - Starting the php script for crawling reviews from hotels on tripadvisor
+ **/
 
 @Component({
   selector: 'my-crawler',

@@ -2,6 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import {GtConfig} from 'angular-generic-table/generic-table/interfaces/gt-config';
 import {Http} from '@angular/http';
 
+/**
+ * Author: Sergej Bardin / bardin@hm.edu
+ * DB Component:
+ * - UI for the Tripadvisor DB
+ * - Starting PHP Script to export data from db as csv
+ **/
+
 @Component({
   selector: 'my-db',
   templateUrl: './db.component.html',
