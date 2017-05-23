@@ -89,7 +89,6 @@
       <div *ngIf="c.city != '' && c.amountOfHotels != ''">
         {{c.city}} <br />
         Amount of Hotels: {{c.amountOfHotels}} <br />
-
         <hr/>
 
         <div id="buttonBox">
@@ -98,7 +97,7 @@
 
       </div>
 
-      <div *ngIf="c.city == ''">
+      <div *ngIf="c.city == '' || c.amountOfHotels == ''">
         <div class="error">Error Loading Preview for City! - Please check the URL!</div>
       </div>
     </ul>

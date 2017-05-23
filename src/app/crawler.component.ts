@@ -76,7 +76,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
       this.logText('Start Preview Loading for City!' );
       this.logText('URL is valid!' );
 
-      this.http.get('http://localhost/preview.php?url=' + url + '&type=city')
+      this.http.get('http://tripad.ilmbucks.de/preview.php?url=' + url + '&type=city')
         .map(response => response.json())
         .subscribe(result => this.previewCityData = result);
 
@@ -89,7 +89,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
       this.logText('Start Preview Loading!' );
       this.logText('URL is valid!' );
 
-      this.http.get('http://localhost/preview.php?url=' + url + '&type=hotel')
+      this.http.get('http://tripad.ilmbucks.de/preview.php?url=' + url + '&type=hotel')
                 .map(response => response.json())
                 .subscribe(result => this.previewData = result);
 
@@ -119,7 +119,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     if (url.toString().startsWith(this.urlCheck)) {
       this.logText('Start Crawling!' );
 
-      this.http.get('http://localhost/crawler.php?url=' + url + '&type=hotel')
+      this.http.get('http://tripad.ilmbucks.de/crawler.php?url=' + url + '&type=hotel')
                 .map(response => response.json())
                 .subscribe(result => this.data = result);
 
@@ -130,7 +130,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     } else if (url.toString().startsWith(this.urlCityCheck)) {
       this.logText('Start City Crawling!' );
 
-      this.http.get('http://localhost/crawler.php?url=' + url + '&type=city')
+      this.http.get('http://tripad.ilmbucks.de/crawler.php?url=' + url + '&type=city')
         .map(response => response.json())
         .subscribe(result => this.data = result);
 

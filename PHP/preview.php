@@ -70,8 +70,6 @@
             
         } elseif($type == 'city') {
             foreach($links as $element){
-                $as = $element->getElementsByTagName('a');
-                $spans = $element->getElementsByTagName('span');
                 $divs = $element->getElementsByTagName('h1');
                 $divs2 = $element->getElementsByTagName('div');
 
@@ -87,7 +85,7 @@
                     };
                 };
             };
-            array_push($data, array('city' => $city, '$amountOfHotels' => $amountOfHotels));
+            array_push($data, array('city' => $city, 'amountOfHotels' => $amountOfHotels));
         }
         echo json_encode($data);
     }
