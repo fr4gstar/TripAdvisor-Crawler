@@ -39,8 +39,11 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     svgStyle: { width: '100%' }
   };
 
+  private serverURL = "";
+
   private preview = false;
   private previewCity = false;
+  private result = false;
   private data = '';
   private previewData = '';
   private previewCityData = '';
@@ -66,6 +69,8 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
   getPreview(url: string) {
     let start = (new Date().getTime());
     let end;
+
+    this.result = false;
 
     if (url.toString() === '') {
       this.preview = false;
@@ -118,6 +123,8 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
     this.lineComp.animate(0.2);
     if (url.toString().startsWith(this.urlCheck)) {
       this.logText('Start Crawling!' );
+      this.preview = false;
+      this.previewCity = false;
 
       this.http.get('http://tripad.ilmbucks.de/crawler.php?url=' + url + '&type=hotel')
                 .map(response => response.json())
@@ -127,6 +134,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
       this.logText('Crawling - URL: ' + url);
       this.lineComp.animate(1.0);
       this.lineComp.setText('Successful');
+      this.result = true;
     } else if (url.toString().startsWith(this.urlCityCheck)) {
       this.logText('Start City Crawling!' );
 
@@ -138,6 +146,7 @@ export class CrawlerComponent implements OnInit, AfterViewInit {
       this.logText('Crawling - URL: ' + url);
       this.lineComp.animate(1.0);
       this.lineComp.setText('Successful');
+      this.result = true;
     } else {
       this.lineComp.setProgress(0.0);
       this.lineComp.setText('Invalid URL: ' + url);

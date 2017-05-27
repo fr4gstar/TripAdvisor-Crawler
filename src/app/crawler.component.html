@@ -84,6 +84,35 @@
       </div>
     </ul>
   </div>
+  <div *ngIf="result" class="preview">
+    <h4>Result</h4>
+    <ul *ngFor="let d of data">
+      <div *ngIf="d.type != '' && d.message != ''">
+        Type: {{d.type}} <br />
+        Message: {{d.message}} <br />
+        Running Time: {{d.secondsRunning}} <br />
+        <br />
+        Successfull Crawled Hotels: {{d.countHotelSuccess}}  <br />
+        Crawled Hotels with Error: {{d.countHotelError}}  <br />
+        Successfull Crawled Users: {{d.countUserSucess}}  <br />
+        Crawled Users Error: {{d.countUserError}}  <br />
+        Successfull Crawled Reviews: {{d.countReviewSuccess}}  <br />
+        Crawled Reviews Error: {{d.countReviewError}}  <br />
+        Successfull Crawled Images: {{d.countImageSuccess}}  <br />
+        Crawled Reviews Error: {{d.countImageError}}  <br />
+        <hr/>
+
+        <div id="buttonBox">
+          <button id="btn_start" type="button" (click)="getData(url.value)">Import to Database</button>
+        </div>
+      </div>
+
+      <div *ngIf="d.name == '' || d.street == '' || d.locality == '' || d.country == '' || d.amountOfReviews == ''">
+        <div class="error">Error Loading Preview for Hotel! - Please check the URL!</div>
+      </div>
+    </ul>
+  </div>
+
   <div *ngIf="previewCity" class="preview">
     <ul *ngFor="let c of previewCityData">
       <div *ngIf="c.city != '' && c.amountOfHotels != ''">
