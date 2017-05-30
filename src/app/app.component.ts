@@ -6,8 +6,6 @@ import { Component } from '@angular/core';
     <header>TripAdvisor-Crawler</header>
     <br />
         <nav>
-          <!-- <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a> -->
-          
           <a routerLink="/db" routerLinkActive="active">Database</a>
           <a routerLink="/crawler" routerLinkActive="active">Crawler</a>
         </nav>

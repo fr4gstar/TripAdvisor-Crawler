@@ -104,8 +104,8 @@
     function connectToDB(){
         $servername = "localhost";
         $username = "root";
-        $password = "";
-        $dbname = "crawler";
+        $password = "TripadvisorFHM";
+        $dbname = "tripadvisor_crawler";
         
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
