@@ -55,7 +55,7 @@
     function loadData() {
         $conn = connectToDB();
         $data = array();
-        $sql_Hotel = "SELECT * FROM TA_HOTEL, TA_Review, TA_User where TA_Hotel.HotelID = TA_Review.HotelID and TA_Review.UserID = TA_User.UserID;";
+        $sql_Hotel = "SELECT * FROM ta_hotel, ta_review, ta_user where ta_hotel.HotelID = ta_review.HotelID and ta_review.UserID = ta_user.UserID;";
         $result = $conn->query($sql_Hotel);
         
         if ($result->num_rows > 0) {

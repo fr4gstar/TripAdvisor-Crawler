@@ -6,7 +6,6 @@ import { AppComponent }  from './app.component';
 import { CrawlerComponent }   from './crawler.component';
 import { DBComponent }   from './db.component';
 import { HttpModule, JsonpModule } from '@angular/http';
-import { GenericTableModule } from 'angular-generic-table';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BusyModule } from 'angular2-busy';
 
@@ -15,7 +14,6 @@ import { BusyModule } from 'angular2-busy';
                     BrowserModule,
                     AppRoutingModule,
                     HttpModule,
-                    GenericTableModule,
                     BrowserAnimationsModule,
                     BusyModule,
                     JsonpModule
