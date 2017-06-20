@@ -82,6 +82,13 @@ textarea {
   height: 30px;
 }
 
+#btn_export{
+  width: 25%;
+  background: blue;
+  color: white;
+  height: 30px;
+}
+
 #console{
   float: left;
   width: 100%;

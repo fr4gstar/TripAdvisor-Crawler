@@ -18,7 +18,8 @@ import 'rxjs/add/operator/map';
 })
 export class CrawlerComponent implements OnInit {
 
-  private serverURL = '';
+  private serverURL = 'http://tripad.ilmbucks.de/';
+  // private serverURL = 'http://localhost/';
   private busy;
   private preview = false;
   private previewCity = false;
@@ -28,8 +29,9 @@ export class CrawlerComponent implements OnInit {
   private previewCityData = '';
   private logNr = 0;
   private log = '';
-  private urlCheck = 'https://www.tripadvisor.de/Hotel_Review-g';
-  private urlCityCheck = 'https://www.tripadvisor.de/Hotels-g';
+  private tripadvisorUrl = 'https://www.tripadvisor.';
+  private urlCheck = '/Hotel_Review-g';
+  private urlCityCheck = '/Hotels-g';
   // Switch to Debug Mode with Console
   private debugMode: Boolean = false;
 
@@ -37,7 +39,10 @@ export class CrawlerComponent implements OnInit {
     this.log += `${this.logNr}: ${value}\n`;
     this.logNr ++;
   }
-
+  /**
+   * Initializes the modules
+   * @params http for http requests
+   **/
   constructor(private http: Http) {
   }
 
@@ -45,6 +50,10 @@ export class CrawlerComponent implements OnInit {
     this.logText(`Log started!`);
   }
 
+  /**
+   * Gets the preview data by an url
+   * @params url to a hotel
+   **/
   getPreview(url: string) {
     let start = (new Date().getTime());
     let end;
@@ -55,22 +64,23 @@ export class CrawlerComponent implements OnInit {
       this.preview = false;
       this.previewCity = false;
       this.logText('Waiting for URL!');
-    } else if (url.toString().startsWith(this.urlCityCheck)) {
-      this.logText('Start Preview Loading for City!' );
-      this.logText('URL is valid!' );
+    } else if (url.toString().startsWith(this.tripadvisorUrl) &&
+      url.toString().includes(this.urlCityCheck)) {
+        this.logText('Start Preview Loading for City!' );
+        this.logText('URL is valid!' );
 
-      this.busy = this.http.get('http://tripad.ilmbucks.de/preview.php?url=' + url + '&type=city')
-        .map(response => response.json())
-        .subscribe(result => this.previewCityData = result);
+        this.busy = this.http.get(this.serverURL + 'preview.php?url=' + url + '&type=city')
+          .map(response => response.json())
+          .subscribe(result => this.previewCityData = result);
 
-      this.preview = false;
-      this.previewCity = true;
-      this.logText('Preview loading - URL: ' + url);
-    } else if (url.toString().startsWith(this.urlCheck)) {
+        this.preview = false;
+        this.previewCity = true;
+        this.logText('Preview loading - URL: ' + url);
+    } else if (url.toString().startsWith(this.tripadvisorUrl) &&  url.toString().includes(this.urlCheck)) {
       this.logText('Start Preview Loading!' );
       this.logText('URL is valid!' );
 
-      this.busy = this.http.get('http://tripad.ilmbucks.de/preview.php?url=' + url + '&type=hotel')
+      this.busy = this.http.get(this.serverURL + 'preview.php?url=' + url + '&type=hotel')
                 .map(response => response.json())
                 .subscribe(result => this.previewData = result);
 
@@ -88,24 +98,28 @@ export class CrawlerComponent implements OnInit {
     this.logText('Total time: ' + ((end - start) / 1000) + 'ms \n');
   }
 
+  /**
+   * Starts the crawling php script to a given hotel/city
+   * @params url to a hotel
+   **/
   getData(url: string) {
     let start = (new Date().getTime());
     let end;
     this.preview = false;
     this.previewCity = false;
 
-    if (url.toString().startsWith(this.urlCheck)) {
+    if (url.toString().startsWith(this.tripadvisorUrl) && url.toString().includes(this.urlCheck)) {
       this.logText('Start Crawling!' );
-      this.busy = this.http.get('http://tripad.ilmbucks.de/crawler.php?url=' + url + '&type=hotel')
+      this.busy = this.http.get(this.serverURL + 'crawler.php?url=' + url + '&type=hotel')
                 .map(response => response.json())
                 .subscribe(result => this.data = result);
 
       this.logText('Crawling - URL: ' + url);
       this.result = true;
-    } else if (url.toString().startsWith(this.urlCityCheck)) {
+    } else if (url.toString().startsWith(this.tripadvisorUrl) && url.toString().includes(this.urlCityCheck)) {
       this.logText('Start City Crawling!' );
 
-      this.busy = this.http.get('http://tripad.ilmbucks.de/crawler.php?url=' + url + '&type=city')
+      this.busy = this.http.get(this.serverURL + 'crawler.php?url=' + url + '&type=city')
         .map(response => response.json())
         .subscribe(result => this.data = result);
 
