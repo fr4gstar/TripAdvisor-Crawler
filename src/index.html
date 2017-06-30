@@ -5,19 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/angular2-busy/build/style/busy.css">
 
     <!-- Polyfill(s) for older browsers -->
-    <script src="node_modules/core-js/client/shim.min.js"></script>
+    <!--    <script src="node_modules/core-js/client/shim.min.js"></script>
 
-    <script src="node_modules/zone.js/dist/zone.js"></script>
-    <script src="node_modules/systemjs/dist/system.src.js"></script>
+        <script src="node_modules/zone.js/dist/zone.js"></script>
+        <script src="node_modules/systemjs/dist/system.src.js"></script>
+    -->
+    <!-- Polyfills -->
+    <script src="https://unpkg.com/core-js/client/shim.min.js"></script>
 
-    <script src="systemjs.config.js"></script>
+    <!-- Update these package versions as needed -->
+    <script src="https://unpkg.com/zone.js@0.8.11?main=browser"></script>
+    <script src="https://unpkg.com/systemjs@0.20.12/dist/system.src.js"></script>
+
+    <script src="systemjs.config.server.js"></script>
     <script>
       System.import('main.js').catch(function(err){ console.error(err); });
     </script>
 
-
+<!--
     <script>
       function x($scope) {
         $scope.urlText = "";
@@ -26,7 +34,7 @@
         };
       }
     </script>
-
+-->
     <title>TripAdvisor-Crawler</title>
   </head>
 

@@ -23,10 +23,12 @@
       '@angular/router': 'npm:@angular/router/bundles/router.umd.js',
       '@angular/router/upgrade': 'npm:@angular/router/bundles/router-upgrade.umd.js',
       '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
+      '@angular/animations': 'npm:@angular/animations/bundles/animations.umd.js',
+      '@angular/animations/browser': 'npm:@angular/animations/bundles/animations-browser.umd.js',
+      '@angular/platform-browser/animations': 'npm:@angular/platform-browser/bundles/platform-browser-animations.umd.js',
 
-      'angular2-progressbar': 'node_modules/angular2-progressbar',
-      'angular-generic-table': 'node_modules/angular-generic-table',
-      'progressbar.js': 'node_modules/progressbar.js',
+      'angular2-busy': 'npm:angular2-busy',
+      'angular-generic-table': 'npm:angular-generic-table',
       // other libraries
       'rxjs':                      'npm:rxjs',
       'angular-in-memory-web-api': 'npm:angular-in-memory-web-api/bundles/in-memory-web-api.umd.js'
@@ -44,15 +46,11 @@
       rxjs: {
         defaultExtension: 'js'
       },
-      'angular2-progressbar': {
-        main: 'dist/index.js',
-        defaultExtension: 'js'
-      },
-      'progressbar.js': {
-        main: 'dist/progressbar.js',
-        defaultExtension: 'js'
-      },
       'angular-generic-table': {
+        main: 'index.js',
+        defaultExtension: 'js'
+      },
+      'angular2-busy': {
         main: 'index.js',
         defaultExtension: 'js'
       }
