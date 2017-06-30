@@ -3,8 +3,7 @@
 ###Database
 Configure your own database enviornment settings in php scripts.
 
-
-###Start in develop mode
+###Develop mode
 ```bash
 npm start
 ```
@@ -16,4 +15,8 @@ npm start
  enableProdMode();
 ```
 
+### Documenation with CompoDoc
+```bash
+npm run compodoc
+```
 ###### Matthias Gutman - Andreas Geyer - Sergej Bardin
